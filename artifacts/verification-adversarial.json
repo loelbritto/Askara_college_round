@@ -1,0 +1,33 @@
+{
+  "verifiedOn": "2026-10-10",
+  "scope": "Local application security boundaries; synthetic documents; no live model or cloud calls",
+  "deterministic": {
+    "file": "tests/adversarial.test.ts",
+    "passed": 5,
+    "provider": "Mocked Google SDK",
+    "checks": [
+      "Instruction-like JSON remains data and unselected documents are excluded",
+      "Forged auth fields and wrong-origin requests cannot bypass route access",
+      "Source blocks are reconstructed and model action fields do not become actions",
+      "Forged complete flags, quotes, source identities and offsets cannot certify a report",
+      "Action-only output fails validation without tool execution"
+    ]
+  },
+  "browser": {
+    "file": "e2e/adversarial.spec.ts",
+    "passed": 1,
+    "server": "Compiled Next.js production app on loopback port 3001",
+    "checks": ["Archive restore", "Source inspection", "Explanation and note rendering", "Print rendering", "Plain-text brief and JSON export"],
+    "injectedElementsObserved": 0,
+    "scriptMarkerObserved": false,
+    "externalRequestAttempts": 0,
+    "mutationRequestAttempts": 0
+  },
+  "typecheck": "passed",
+  "limitations": [
+    "Hand-authored cases are not a representative security benchmark",
+    "No live model semantic prompt-injection resistance measured",
+    "No hosted auth, database gateway or infrastructure verified",
+    "Prior tests were not rerun solely to aggregate counts; new tests ran separately"
+  ]
+}

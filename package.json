@@ -1,0 +1,44 @@
+{
+  "name": "second-opinion",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "node scripts/copy-pdf-worker.mjs && next build",
+    "start": "next start --hostname 127.0.0.1",
+    "postinstall": "node scripts/copy-pdf-worker.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "verify:recovery": "tsx scripts/verify-recovery.ts",
+    "verify:supabase": "tsx --env-file=.env.local scripts/verify-supabase.ts",
+    "evaluate": "tsx --env-file=.env.local scripts/evaluate.ts",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "@google/genai": "2.28.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "lucide-react": "1.55.0",
+    "next": "16.4.0",
+    "pdfjs-dist": "6.4.299",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tailwindcss": "4.3.3",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@electric-sql/pglite": "0.5.8",
+    "@playwright/test": "1.64.0",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3"
+  },
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  }
+}

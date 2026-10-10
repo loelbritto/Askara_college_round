@@ -1,0 +1,15 @@
+node_modules/
+.next/
+.git/
+.vercel/
+.env*
+.aws/
+.codex/
+.agents/
+artifacts/
+test-results/
+playwright-report/
+evaluation-results/
+tmp/
+*.tsbuildinfo
+public/pdf.worker.min.mjs

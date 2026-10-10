@@ -1,0 +1,45 @@
+import { test, expect } from "@playwright/test";
+import { readFile } from "node:fs/promises";
+import { createSource } from "../src/lib/canonical";
+import { validateOutput } from "../src/lib/validate-report";
+import { createArchive } from "../src/lib/workspace-archive";
+import type { AuditRequest, ModelOutput } from "../src/lib/contracts";
+
+const markup = '<img data-attack="yes" src="https://exfil.invalid/pixel" onerror="window.__attack=1"><script data-attack="yes">window.__attack=1</script>';
+const note = '[Send documents](javascript:window.__attack=1) <iframe data-attack="yes" src="https://exfil.invalid/frame"></iframe>';
+
+test("hostile text stays inert through restore, source inspection, review, print and export",async ({page}) => {
+  const source = await createSource('<img data-attack="yes" src="https://exfil.invalid/name">',[{number:1,text:`Receipts are required.\n\n${markup}`}]);
+  const answer = "Receipts are required.";
+  const request:AuditRequest = {mode:"audit",answer,context:"",sources:[source],selectedSourceIds:[source.id]};
+  const raw:ModelOutput = {findings:[{id:"c1",segmentId:"s1",answerQuote:answer,proposition:answer,verdict:"supported",issues:[],explanation:markup,strength:"direct",evidence:[{blockId:source.blocks[0].id,quote:answer,relation:"supports"}]}],nonfactualSegmentIds:[],tooManyClaims:false};
+  const report = validateOutput(raw,request,[source],{origin:"sample",model:"synthetic security fixture",elapsedMs:0});
+  const archive = await createArchive({sources:[source],selectedIds:[source.id],answer,context:"",sampleMode:true,setupStep:3,baseline:report,comparison:null,showComparison:false,history:[],reviews:{[`${report.id}:c1`]:{checked:false,note}},ruleReviews:{}});
+  const exfiltration:string[] = [],mutations:string[] = [];
+  page.on("request",request => {if(request.url().includes("exfil.invalid"))exfiltration.push(request.url());if(request.method()!=="GET")mutations.push(request.url());});
+  await page.route("https://exfil.invalid/**",route => route.abort());
+  await page.goto("/workspace");
+  await page.getByRole("button",{name:"Save or open a review",exact:true}).click();
+  const chooser = page.waitForEvent("filechooser"); await page.getByRole("button",{name:"Open review file",exact:true}).click();
+  await (await chooser).setFiles({name:"hostile-text-review.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(archive))});
+  await page.getByRole("button",{name:"Replace with saved review"}).click();
+  await expect(page.locator(".explanation")).toHaveText(`WHY THIS VERDICT${markup}`);
+  await expect(page.getByLabel("Reviewer note for C1")).toHaveValue(note);
+  await page.locator(".citation").first().click();
+  await expect(page.getByRole("dialog")).toContainText(markup);
+  await expect(page.locator('[data-attack="yes"]')).toHaveCount(0);
+  await page.getByRole("button",{name:"Done",exact:true}).click();
+  await page.emulateMedia({media:"print"});
+  await expect(page.locator(".print-report")).toContainText(markup);
+  await expect(page.locator('[data-attack="yes"]')).toHaveCount(0);
+  await page.emulateMedia({media:"screen"});
+  const download = page.waitForEvent("download"); await page.getByRole("button",{name:"Download review brief"}).click();
+  const brief = await download;
+  expect(brief.suggestedFilename()).toMatch(/\.txt$/);
+  const content = await readFile((await brief.path())!,"utf8"); expect(content).toContain(markup); expect(content).toContain(note);
+  const jsonDownload = page.waitForEvent("download"); await page.getByRole("button",{name:"Export JSON",exact:true}).click();
+  const exported = JSON.parse(await readFile((await (await jsonDownload).path())!,"utf8"));
+  expect(exported.findings[0].explanation).toBe(markup); expect(exported.baselineToken).toBeUndefined();
+  expect(await page.evaluate(() => (window as Window & {__attack?:number}).__attack)).toBeUndefined();
+  expect(exfiltration).toEqual([]); expect(mutations).toEqual([]);
+});

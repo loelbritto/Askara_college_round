@@ -1,0 +1,30 @@
+{
+  "verifiedAt": "2026-10-10T15:50:20.433Z",
+  "unitRouteAndDatabase": {
+    "passed": 93,
+    "files": 14,
+    "databaseTests": 7,
+    "lastDatabaseEdgeCaseRerun": "passed"
+  },
+  "browser": {
+    "passed": 26,
+    "server": "local production",
+    "modelAndCloudTransport": "stubbed",
+    "fileRoundTrip": "real"
+  },
+  "build": "passed",
+  "npmAuditAtInstall": {
+    "packages": 131,
+    "vulnerabilities": 0
+  },
+  "externalServicesConfigured": false,
+  "pending": [
+    "actual Gemini outputs and evaluation",
+    "independent human annotation",
+    "five unfamiliar users",
+    "hosted Supabase gateway and separate-connection concurrency",
+    "provider retention configuration",
+    "operational recovery exercises",
+    "hosted release"
+  ]
+}

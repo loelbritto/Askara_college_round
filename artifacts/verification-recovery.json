@@ -1,0 +1,50 @@
+{
+  "verifiedAt": "2026-10-10T15:57:29.663Z",
+  "scope": "Local compiled production HTTP server; synthetic pilot sessions; no model or cloud calls",
+  "checks": [
+    {
+      "name": "disabled health",
+      "status": 200
+    },
+    {
+      "name": "authenticated audit disabled",
+      "status": 503,
+      "code": "DISABLED"
+    },
+    {
+      "name": "disabled audit still rejects anonymous access",
+      "status": 401,
+      "code": "UNAUTHORIZED"
+    },
+    {
+      "name": "enabled health after restart",
+      "status": 200
+    },
+    {
+      "name": "signed no-evidence comparison recovers",
+      "status": 200
+    },
+    {
+      "name": "missing provider configuration fails closed",
+      "status": 503,
+      "code": "NOT_CONFIGURED"
+    },
+    {
+      "name": "secret rotation invalidates previous session",
+      "status": 401,
+      "code": "UNAUTHORIZED"
+    },
+    {
+      "name": "previous baseline cannot enter new session",
+      "status": 409,
+      "code": "STALE_BASELINE"
+    }
+  ],
+  "traceCount": 8,
+  "tracePrivacy": "Allowed fields only; no synthetic credentials, source name or answer in captured application traces",
+  "limitations": [
+    "Not a hosted deployment rollback",
+    "Not Supabase revocation or outage recovery",
+    "No live model quality or provider recovery measured"
+  ]
+}

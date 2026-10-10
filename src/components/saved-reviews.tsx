@@ -1,0 +1,47 @@
+"use client";
+import { useRef, useState } from "react";
+import { z } from "zod";
+import { Download, FolderOpen, Save, Trash2, Upload } from "lucide-react";
+import { ARCHIVE_BYTES, createArchive, readArchive } from "@/lib/workspace-archive";
+import { readApiResponse } from "@/lib/client-response";
+import { emptyWorkspace, useWorkspaceMemory } from "./workspace-memory";
+import { Modal } from "./ui";
+
+const savedSchema=z.object({id:z.uuid(),title:z.string().max(100),version:z.number().int().min(1).max(20),updatedAt:z.string(),versions:z.array(z.number().int().min(1).max(20)).max(20)});
+type Saved=z.infer<typeof savedSchema>;
+export function SavedReviews({disabled,account,authenticated,onSignIn,onSignOut,onExpired}:{disabled:boolean;account:boolean;authenticated:boolean;onSignIn:()=>void;onSignOut:()=>Promise<void>;onExpired:()=>void}){
+  const {state,setState}=useWorkspaceMemory();
+  const [open,setOpen]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(""),[notice,setNotice]=useState("");
+  const [title,setTitle]=useState(""),[saved,setSaved]=useState<Saved[]>([]),[loaded,setLoaded]=useState(false),[versions,setVersions]=useState<Record<string,number>>({});
+  const [pending,setPending]=useState<{value:Awaited<ReturnType<typeof readArchive>>;record:{id:string;version:number;title:string}|null}|null>(null),[remove,setRemove]=useState<Saved|null>(null);
+  const input=useRef<HTMLInputElement>(null),working=useRef(false);
+  async function perform(action:()=>Promise<void>){if(working.current)return;working.current=true;setBusy(true);setError("");setNotice("");try{await action();}catch(e){setError(e instanceof Error?e.message:"This action failed. Your current workspace is unchanged.");}finally{working.current=false;setBusy(false);}}
+  async function call(body:unknown){const response=await fetch("/api/workspaces",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(response.status===401)onExpired();return readApiResponse<unknown>(response,"Saved reviews are temporarily unavailable.");}
+  async function list(){const data=z.array(savedSchema).max(5).parse(await call({action:"list"}));setSaved(data);setLoaded(true);}
+  async function download(){const archive=await createArchive(state),url=URL.createObjectURL(new Blob([JSON.stringify(archive)],{type:"application/json"}));const link=document.createElement("a");link.href=url;link.download="second-opinion-workspace.json";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setNotice("Review file downloaded. It contains policy text, reports, and your notes. Keep it somewhere appropriate for those documents.");}
+  async function importFile(file:File|undefined){if(!file)return;if(file.size>ARCHIVE_BYTES)throw new Error("Choose a review file smaller than 2 MB.");let data:unknown;try{data=JSON.parse(await file.text());}catch{throw new Error("Choose a Second Opinion workspace JSON file.");}setPending({value:await readArchive(data),record:null});}
+  function restore(){if(!pending)return;const {value,record}=pending;setState(previous=>({...emptyWorkspace(),...value.workspace,revision:previous.revision+1,restoredAt:value.archive.savedAt,savedWorkspace:record,selectedClaim:value.workspace.baseline?.findings[0]?.id??"c1",view:value.workspace.showComparison?"compare":"answer"}));}
+  async function save(copy:boolean){const archive=await createArchive(state),current=copy?null:state.savedWorkspace;
+    const result=z.object({id:z.uuid(),version:z.number().int().min(1).max(20)}).parse(await call({action:"save",archive,title,id:current?.id??null,expectedVersion:current?.version??0}));
+    setState(previous=>({...previous,savedWorkspace:{...result,title:title.trim()}}));setNotice(`Saved version ${result.version}. Changes made afterward stay in this tab until you save again.`);setLoaded(false);
+  }
+  return <><div className="saved-review-entry no-print"><button className="button secondary" disabled={disabled} onClick={()=>{setOpen(true);setTitle(state.savedWorkspace?.title??"My policy review");setError("");setNotice("");setPending(null);setRemove(null);}}><FolderOpen size={16}/> Save or open a review</button><span>{state.savedWorkspace?`Saved through version ${state.savedWorkspace.version} · save again to keep changes`:"Your work stays in this tab until you choose to save."}</span></div>
+    {open&&<Modal title="Save or open a review" onClose={()=>{if(!busy)setOpen(false);}} wide><div className="saved-reviews">
+      <p>Keep your documents, reports, policy interpretations, and notes together. Nothing is saved automatically.</p>
+      {error&&<p className="form-error" role="alert">{error}</p>}{notice&&<p className="save-notice" role="status">{notice}</p>}
+      {pending?<section className="save-confirm"><h3>Replace the review in this tab?</h3><p>The file contains {pending.value.archive.reports.length} reports and {pending.value.workspace.sources.length} current policies. Its saved results have not been rechecked. Download your current work first if you need to keep it.</p><div className="modal-actions"><button className="button secondary" onClick={()=>setPending(null)}>Keep current review</button><button className="button primary" onClick={restore}>Replace with saved review</button></div></section>:<>
+      <section className="save-section"><h3>Keep a file on your device</h3><p>No account needed. The file includes document text; it is not encrypted by this application.</p><div className="save-actions"><button className="button secondary" disabled={busy||(!state.answer&&!state.sources.length)} onClick={()=>perform(download)}><Download size={15}/> Download review file</button><button className="button secondary" disabled={busy} onClick={()=>input.current?.click()}><Upload size={15}/> Open review file</button><input ref={input} type="file" accept=".json,application/json" hidden onChange={e=>{const file=e.target.files?.[0];e.target.value="";void perform(()=>importFile(file));}}/></div></section>
+      <section className="save-section"><h3>Save to your account</h3><p>Saving sends this review to the configured Supabase database. Saved versions remain until you delete the review. Clearing this tab does not delete saved copies.</p>
+      {!account?<p className="small muted">Account storage is not configured on this installation. Downloading and opening review files still works.</p>:!authenticated?<button className="button secondary" onClick={()=>{setOpen(false);onSignIn();}}>Sign in to save or open</button>:<>
+        <label className="field-label" htmlFor="saved-title">Review name</label><input id="saved-title" className="text-input" maxLength={100} value={title} disabled={busy} onChange={e=>setTitle(e.target.value)}/>
+        <div className="save-actions"><button className="button primary" disabled={busy||!title.trim()||(!state.answer&&!state.sources.length)} onClick={()=>perform(()=>save(false))}><Save size={15}/>{state.savedWorkspace?"Save a new version":"Save review"}</button>{state.savedWorkspace&&<button className="button secondary" disabled={busy||!title.trim()} onClick={()=>perform(()=>save(true))}>Save a separate copy</button>}<button className="button secondary" disabled={busy} onClick={()=>perform(list)}>{loaded?"Refresh saved list":"Show saved reviews"}</button></div>
+        {loaded&&!saved.length&&<p>No saved reviews yet. Save this review to find it here later.</p>}
+        {loaded&&<ul className="saved-list">{saved.map(record=><li key={record.id}><div><strong>{record.title}</strong><span>Saved {new Date(record.updatedAt).toLocaleString()}</span><label>Version<select className="text-input" aria-label={`Version of ${record.title}`} disabled={busy} value={versions[record.id]??record.version} onChange={e=>setVersions(v=>({...v,[record.id]:Number(e.target.value)}))}>{record.versions.map(v=><option key={v} value={v}>Version {v}{v===record.version?" (latest)":""}</option>)}</select></label></div><div className="save-actions"><button className="button secondary" disabled={busy} onClick={()=>perform(async()=>{const version=versions[record.id]??record.version;const value=await readArchive(await call({action:"load",id:record.id,version}));setPending({value,record:{id:record.id,version,title:record.title}});})}>Open saved review</button><button className="button danger" disabled={busy} aria-label={`Delete ${record.title}`} onClick={()=>setRemove(record)}><Trash2 size={15}/></button></div></li>)}</ul>}
+        {remove&&<div className="save-confirm"><h3>Delete “{remove.title}” and all its saved versions?</h3><p>This removes the database copies. Downloaded files and the review currently open in this tab are separate copies.</p><div className="save-actions"><button className="button secondary" disabled={busy} onClick={()=>setRemove(null)}>Keep saved review</button><button className="button danger" disabled={busy} onClick={()=>perform(async()=>{await call({action:"delete",id:remove.id,expectedVersion:remove.version});if(state.savedWorkspace?.id===remove.id)setState(previous=>({...previous,savedWorkspace:null}));setSaved(rows=>rows.filter(row=>row.id!==remove.id));setRemove(null);setNotice("Saved review and its versions deleted. This tab and downloaded files are unchanged.");})}>Delete all saved versions</button></div></div>}
+        <button className="text-button" disabled={busy} onClick={()=>perform(onSignOut)}>Sign out on all devices</button>
+      </>}
+      </section></>}
+      {busy&&<p role="status">Working… Your current review stays available.</p>}
+    </div></Modal>}
+  </>;
+}
