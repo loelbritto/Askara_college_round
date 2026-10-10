@@ -31,7 +31,7 @@ test("review notes persist across pages, present with real citations, and export
   const downloadPromise=page.waitForEvent("download");await page.getByRole("button",{name:"Download review brief"}).click();const download=await downloadPromise;
   const text=await readFile((await download.path())!,"utf8");expect(text).toContain("Authored synthetic sample. No AI call.");expect(text).toContain("Reviewer note: Check the unopened-item condition");expect(text).not.toContain("sample-only");
   await page.getByRole("button",{name:"Back to workspace"}).click();await expect(page.locator(".finding-row")).toHaveCount(6);
-  await page.reload();await expect(page.getByRole("heading",{name:"Add the policies to check against."})).toBeVisible();await expect(page.locator(".source-card")).toHaveCount(0);
+  await page.reload();await expect(page.getByRole("heading",{name:"A second look. A clearer answer."})).toBeVisible();await expect(page.locator(".source-card")).toHaveCount(0);
 });
 
 test("replacing a case is explicit and the missing-source case preserves a baseline",async({page})=>{

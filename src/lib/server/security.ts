@@ -1,17 +1,17 @@
 import { createHmac, timingSafeEqual, randomUUID } from "node:crypto";
 import { AuditError, type AuditRequest, LIMITS } from "../contracts";
 import { accountConfiguration, accountMode } from "./account-config";
+import { providerConfig } from "./provider-config";
 export const COOKIE_NAME = "second_opinion_session";
 const SESSION_SECONDS = 8 * 60 * 60;
 
 export function configStatus() {
   const missing = [
-    !process.env.GEMINI_API_KEY && "GEMINI_API_KEY",
+    ...providerConfig().missing,
     !accountMode() && (!process.env.PILOT_ACCESS_CODE || process.env.PILOT_ACCESS_CODE.length < 12) && "PILOT_ACCESS_CODE (12+ characters)",
     ...(accountMode()?accountConfiguration().missing:[]),
     !!process.env.AUTH_MODE && !["pilot","supabase"].includes(process.env.AUTH_MODE) && "AUTH_MODE (pilot or supabase)",
     (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) && "SESSION_SECRET (32+ characters)",
-    process.env.FREE_TIER_CONFIRMED !== "true" && "FREE_TIER_CONFIRMED",
     process.env.NODE_ENV === "production" && !process.env.APP_ORIGIN && "APP_ORIGIN",
   ].filter(Boolean) as string[];
   return {configured: missing.length === 0, missing, enabled: process.env.AUDITS_ENABLED !== "false"};

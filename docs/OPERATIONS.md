@@ -1,5 +1,7 @@
 # Second Opinion operating instructions
 
+For the new prepaid DeepSeek option and the chat-style live demo, use [DeepSeek on Vercel](DEEPSEEK-VERCEL.md). The Gemini free-project requirements below apply only when `AI_PROVIDER=gemini` (the compatibility default). Shared origin, access, recovery and storage controls still apply.
+
 ## Local configuration
 
 Use Node.js 24. `node scripts/configure-local.mjs` creates `.env.local` only when absent and never prints credentials. Add an API key for a project without linked billing; verify active model quotas in AI Studio. Set `FREE_TIER_CONFIRMED=true` after verification. Do not copy private keys into chat, screenshots, commits, or public issue reports.

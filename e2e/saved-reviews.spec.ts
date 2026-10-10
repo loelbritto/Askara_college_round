@@ -9,7 +9,7 @@ test("a complete review file survives refresh, restores notes and rejects damage
   await page.getByLabel("Reviewer note for C1").fill("Check the original receipt before sending.");
   await page.getByRole("button",{name:"Save or open a review",exact:true}).click();
   const downloaded=page.waitForEvent("download");await page.getByRole("button",{name:"Download review file"}).click();const raw=await readFile((await (await downloaded).path())!,"utf8");expect(raw).not.toContain("baselineToken");
-  await page.reload();await expect(page.getByRole("heading",{name:"Let’s check an answer."})).toBeVisible();
+  await page.reload();await expect(page.getByRole("heading",{name:"A second look. A clearer answer."})).toBeVisible();
   await page.getByRole("button",{name:"Save or open a review",exact:true}).click();const chooser=page.waitForEvent("filechooser");await page.getByRole("button",{name:"Open review file",exact:true}).click();await (await chooser).setFiles({name:"review.json",mimeType:"application/json",buffer:Buffer.from(raw)});
   await expect(page.getByRole("heading",{name:"Replace the review in this tab?"})).toBeVisible();await page.getByRole("button",{name:"Replace with saved review"}).click();await expect(page.getByText("Saved review opened",{exact:true})).toBeVisible();await expect(page.getByLabel("Reviewer note for C1")).toHaveValue("Check the original receipt before sending.");
   await page.getByRole("button",{name:"Save or open a review",exact:true}).click();const corrupt=JSON.parse(raw);corrupt.reports[0].findings[0].evidence[0].quote="Fabricated quotation";
@@ -21,11 +21,13 @@ test("a complete review file survives refresh, restores notes and rejects damage
 
 test("individual sign-in preserves the draft and sends credentials only to the session endpoint",async({page})=>{
   const requests:unknown[]=[];
+  const report={...sampleReport(await sampleSources()),origin:"live",model:"test-stub"};
+  await page.route("**/api/audit",r=>r.fulfill({json:report}));
   await page.route("**/api/health",r=>r.fulfill({json:{configured:true,enabled:true,authenticated:false,authMode:"supabase",accountsConfigured:true,model:"test-stub"}}));
   await page.route("**/api/session",route=>{requests.push(route.request().postDataJSON());return route.fulfill({json:{authenticated:true,authMode:"supabase"}});});
   await page.goto("/examples");await page.getByRole("button",{name:"Open refund case"}).click();await page.getByRole("button",{name:"Switch to live"}).click();await page.getByRole("button",{name:"Check answer",exact:true}).click();
   await expect(page.getByRole("dialog",{name:"Sign in to Second Opinion"})).toBeVisible();await page.getByLabel("Email",{exact:true}).fill("reviewer@example.test");await page.getByLabel("Password",{exact:true}).fill("fictional-test-password");expect((await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);await page.getByRole("button",{name:"Sign in",exact:true}).click();
-  await expect(page.getByRole("dialog")).toHaveCount(0);expect(requests).toEqual([{email:"reviewer@example.test",password:"fictional-test-password"}]);await expect(page.getByRole("button",{name:"Check answer",exact:true})).toBeEnabled();
+  await expect(page.getByRole("dialog")).toHaveCount(0);expect(requests).toEqual([{email:"reviewer@example.test",password:"fictional-test-password"}]);await expect(page.locator(".finding-row")).toHaveCount(6);
 });
 
 test("cloud versions, stale-save conflicts and explicit deletion preserve the local review",async({page})=>{

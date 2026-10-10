@@ -10,6 +10,7 @@ export type ExampleId = "returns" | "conflict" | "missing";
 import type { Review } from "@/lib/review";
 import type { AuditVersion } from "@/lib/revisions";
 type WorkspaceState = {
+  guided:boolean;
   sources: Source[]; selectedIds: string[]; answer: string; context: string;
   baseline: Report | null; comparison: Report | null; showComparison: boolean;
   selectedClaim: string; filter: Verdict | "all" | "unresolved";
@@ -17,7 +18,7 @@ type WorkspaceState = {
   reviews: Record<string, Review>; ruleReviews: Record<string, RuleReview>; history: AuditVersion[]; revision: number; setupStep: 1 | 2 | 3;
   restoredAt:string|null; savedWorkspace:{id:string;version:number;title:string}|null;
 };
-export const emptyWorkspace = (): WorkspaceState => ({sources:[],selectedIds:[],answer:"",context:"",baseline:null,comparison:null,showComparison:false,selectedClaim:"c1",filter:"all",view:"answer",changedOnly:false,sampleMode:false,reviews:{},ruleReviews:{},history:[],revision:0,setupStep:1,restoredAt:null,savedWorkspace:null});
+export const emptyWorkspace = (): WorkspaceState => ({guided:false,sources:[],selectedIds:[],answer:"",context:"",baseline:null,comparison:null,showComparison:false,selectedClaim:"c1",filter:"all",view:"answer",changedOnly:false,sampleMode:false,reviews:{},ruleReviews:{},history:[],revision:0,setupStep:1,restoredAt:null,savedWorkspace:null});
 type Memory = { state: WorkspaceState; setState: Dispatch<SetStateAction<WorkspaceState>>; openExample: (id:ExampleId,guided?:boolean)=>void; launching:boolean; ready:boolean };
 const WorkspaceContext=createContext<Memory|null>(null);
 

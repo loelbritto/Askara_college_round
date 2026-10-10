@@ -31,7 +31,7 @@ test("first-time visitor follows one guided example from policies to actionable 
 test("custom review has clear prerequisites and explains unavailable live checking before submission",async({page})=>{
   let audits=0;page.on("request",r=>{if(r.url().endsWith("/api/audit"))audits++;});
   await page.route("**/api/health",r=>r.fulfill({json:{configured:false,enabled:true,authenticated:false,model:"test-stub"}}));
-  await page.goto("/");await page.getByRole("link",{name:"I have my own documents"}).click();
+  await page.goto("/");await page.getByRole("link",{name:"I have my own documents"}).click();await page.getByRole("button",{name:"Prefer a walkthrough? Use the step-by-step guide"}).click();
   await expect(page.getByRole("button",{name:"Continue to answer"})).toBeDisabled();
   await page.getByRole("button",{name:"Paste policy text instead"}).click();
   await page.getByLabel("SOURCE NAME").fill("Returns policy");await page.getByLabel("POLICY TEXT",{exact:true}).fill("Returns are accepted within 14 days.");
@@ -59,7 +59,7 @@ test("mobile and reduced-motion onboarding keeps the next step clear and accessi
 });
 
 test("short laptop screens can enter and complete the guide without scroll-driven controls",async({page})=>{
-  await page.setViewportSize({width:1280,height:650});await page.goto("/workspace");
+  await page.setViewportSize({width:1280,height:650});await page.goto("/workspace");await page.getByRole("button",{name:"Prefer a walkthrough? Use the step-by-step guide"}).click();
   await expect(page.getByRole("heading",{name:"Add the policies to check against."})).toBeVisible();
   await page.getByRole("button",{name:"Use our example policies and answer"}).click();
   await page.getByRole("button",{name:"Continue to answer"}).click();await page.getByRole("button",{name:"Continue to check"}).click();await page.getByRole("button",{name:"Show example results"}).click();

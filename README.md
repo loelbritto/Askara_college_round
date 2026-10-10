@@ -2,9 +2,9 @@
 
 Second Opinion checks an AI answer against a selected packet of business policies. Reviewers inspect atomic claims, exact evidence passages, and hypothetical changes when a source is excluded. The answer and claim propositions stay fixed during comparison.
 
-The repository contains a working local application, authored examples, a real Gemini adapter, validation tests, browser tests, and live-evaluation tooling. **Live Gemini accuracy, account quota, and an external deployment are not established by the authored sample or mocked tests.** See [release status](docs/RELEASE.md).
+The repository contains a working local application, authored examples, DeepSeek and Gemini adapters, validation tests, browser tests, and live-evaluation tooling. **Provider accuracy, available credit and hosted integration are not established by authored samples or mocked tests.** See [release status](docs/RELEASE.md).
 
-The cinematic homepage combines a clear starting action with layered policy visuals and an interactive evidence story. First-time visitors can open a filled-in example; a three-step setup shows one task at a time: add policies, add the answer, then check and review. Six connected pages share the same dark visual identity, responsive navigation, and an in-memory workspace. See [design and visual records](docs/DESIGN.md).
+The cinematic homepage combines a clear starting action with layered policy visuals and an interactive evidence story. First-time visitors can open a filled-in example; the workspace opens with a chat-style answer composer, policy attachments and a single Check answer action. An optional step-by-step guide remains available. Six connected pages share the same dark visual identity, responsive navigation, and an in-memory workspace. See [design and visual records](docs/DESIGN.md).
 
 ## Pages
 
@@ -31,7 +31,13 @@ npm run dev
 
 Open http://127.0.0.1:3000. Choose **Try with an example**, then **Continue to answer**, **Continue to check**, and **Show example results**. Documents and an answer are pre-filled; no API key or model charge is needed. Sample findings are authored for the exact example packet and are labelled throughout the interface. Editing the packet requires a live audit; there is no simulated general-purpose verifier.
 
-For live audits, edit the ignored `.env.local`:
+## DeepSeek live demo on Vercel
+
+Follow [the DeepSeek deployment guide](docs/DEEPSEEK-VERCEL.md). Set `AI_PROVIDER=deepseek`, `DEEPSEEK_API_KEY` and `DEEPSEEK_MODEL=deepseek-flash`, plus the shared session/origin settings. This uses prepaid credit; it does not require a Gemini key or `FREE_TIER_CONFIRMED=true`. The server never retries or switches providers automatically.
+
+Choose **Set up a live demo** to load fictional policies and an answer without an API call, then **Check answer** to request a real audit. Practice examples remain explicitly authored.
+
+For Gemini live audits, edit the ignored `.env.local`:
 
 1. Obtain a Gemini API key for a project **without an active billing account**. Verify the model's active request and token quotas in Google AI Studio.
 2. Add the key as `GEMINI_API_KEY` and set `FREE_TIER_CONFIRMED=true` only after checking the project's unpaid status. This setting is an operator declaration, not a billing API check.

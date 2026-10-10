@@ -17,7 +17,7 @@ test("cinematic landing keeps its interactive story and opens the guided review"
   const axe=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze();expect(axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}))).toEqual([]);
   await page.getByRole("button",{name:"Start guided example",exact:true}).click();await expect(page.getByRole("heading",{name:"Your example policies are ready."})).toBeVisible();
   await page.getByRole("button",{name:"Continue to answer"}).click();
-  await page.locator(".site-header").getByRole("link",{name:"Second Opinion home"}).click();await page.getByRole("link",{name:"Continue your review",exact:true}).click();
+  await page.locator(".site-header").getByRole("link",{name:"Start here",exact:true}).click();await page.getByRole("link",{name:"Continue your review",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Here’s the answer we’ll check."})).toBeVisible();expect(audits).toBe(0);
 });
 

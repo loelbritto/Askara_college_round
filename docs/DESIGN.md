@@ -1,3 +1,7 @@
+# Chat-style workspace update
+
+The current workspace starts with one answer composer, attachment chips, an optional question, and a Check answer action. A sidebar provides a new review and links to examples and methodology. The original cinematic landing is retained. The previous three-step guide remains available on request and for practice examples. Live-demo starter content is fictional; it is loaded without an API call and requires an explicit check. `artifacts/chat-desktop.png` and `artifacts/chat-mobile.png` record mocked-browser UI checks, not a live provider result.
+
 # Second Opinion design
 
 The current design prioritizes a clear first review. A new visitor should understand the required inputs and the next action without learning the dashboard or choosing between six pages.

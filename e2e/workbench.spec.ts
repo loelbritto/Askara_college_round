@@ -36,21 +36,21 @@ test("sample audit, citations, fixed-claim comparison, conflict, export and clea
   await page.getByRole("button",{name:"Restore original audit"}).click();await expect(page.locator(".finding-row").filter({hasText:"Premium members receive free return shipping"})).toContainText("Supported");
   await page.getByRole("button",{name:"Conflicting policies",exact:true}).click();await page.locator(".finding-row").filter({hasText:"Premium members can return unopened"}).click();
   await expect(page.locator(".evidence-panel")).toContainText("Ambiguous / conflicting");await expect(page.locator(".citation.contradicts")).toHaveCount(1);
-  await page.getByRole("button",{name:"New review",exact:true}).click();await page.getByRole("button",{name:"Start a new review",exact:true}).click();
+  await page.getByRole("button",{name:"New review",exact:true}).click();await page.getByRole("button",{name:"Start a new review",exact:true}).click();await page.getByRole("button",{name:"Prefer a walkthrough? Use the step-by-step guide"}).click();
   await expect(page.getByRole("heading",{name:"Add the policies to check against."})).toBeVisible();await expect(page.locator(".source-card")).toHaveCount(0);expect(errors).toEqual([]);
 });
 
 test("source upload, editable input, scanned PDF rejection and session-only refresh",async({page})=>{
   await page.route("**/api/health",r=>r.fulfill({json:{configured:true,enabled:true,authenticated:false,model:"test-stub"}}));
   await page.goto("/");await page.goto("/examples");await page.getByRole("button",{name:"Open refund case"}).click();
-  await page.getByRole("button",{name:"New review",exact:true}).click();await page.getByRole("button",{name:"Start a new review",exact:true}).click();
+  await page.getByRole("button",{name:"New review",exact:true}).click();await page.getByRole("button",{name:"Start a new review",exact:true}).click();await page.getByRole("button",{name:"Prefer a walkthrough? Use the step-by-step guide"}).click();
   await page.locator('input[type="file"]').setInputFiles({name:"public-policy.txt",mimeType:"text/plain",buffer:Buffer.from("Returns are accepted within 12 days. All items must be unopened.")});
   await expect(page.locator(".source-card")).toContainText("public-policy.txt");
   await page.getByRole("button",{name:"Continue to answer"}).click();
   await page.getByLabel("AI answer",{exact:false}).fill("Returns are accepted within 12 days.");
   await page.getByRole("button",{name:"Continue to check"}).click();
   await page.getByRole("button",{name:"Check answer",exact:true}).click();await expect(page.getByRole("dialog",{name:"Open a live pilot session"})).toBeVisible();
-  await page.getByRole("button",{name:"Close dialog"}).click();await page.reload();
+  await page.getByRole("button",{name:"Close dialog"}).click();await page.reload();await page.getByRole("button",{name:"Prefer a walkthrough? Use the step-by-step guide"}).click();
   await expect(page.getByRole("heading",{name:"Add the policies to check against."})).toBeVisible();
   await expect(page.locator(".source-card")).toHaveCount(0);
   await page.locator('input[type="file"]').setInputFiles({name:"readable.pdf",mimeType:"application/pdf",buffer:tinyPdf("All returns must be requested within 12 days.")});

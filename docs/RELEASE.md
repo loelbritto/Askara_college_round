@@ -1,3 +1,15 @@
+# DeepSeek and chat workspace update - 10 October 2026
+
+- Added the explicit `AI_PROVIDER=deepseek` route to the official `deepseek-flash` chat completions API. Gemini remains available; there is no provider fallback. DeepSeek uses prepaid credit and does not require Gemini free-tier confirmation.
+- New chat-style composer and sidebar; direct policy attachments/paste; live demo preparation without an API call; optional step-by-step guide; original landing page retained.
+- Health reports missing configuration names, never values. A requested audit continues once after sign-in. Existing citation validation, report comparison, revision, storage and export controls remain in place.
+- Validation: 117 unit tests across 18 files passed; production build and TypeScript passed. Browser regression: 29/30 passed in the reduced-concurrency full run; the remaining saved-review test passed separately after updating its old heading expectation. All three new composer tests passed, including desktop/mobile axe checks, no duplicate request after sign-in, and preserved draft on credit exhaustion. The initial eight-worker run encountered local resource contention and obsolete UI selectors; it is not claimed as passing.
+- No real DeepSeek API call was made, no key was added to the repository, and no paid balance or model accuracy was verified. A real deployed smoke test is still needed. [Deployment and demo instructions](DEEPSEEK-VERCEL.md).
+
+The records below describe the earlier Gemini-only release and its evidence at that time.
+
+---
+
 # Second Opinion release status
 
 Verified locally on 10 October 2026 with Node.js 24. **The full three-phase roadmap remains incomplete.** Real Gemini evaluation, independent human annotation/usability, configured Supabase integration, and a hosted release are not yet established.
