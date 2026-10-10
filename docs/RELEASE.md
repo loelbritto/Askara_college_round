@@ -12,7 +12,9 @@ The records below describe the earlier Gemini-only release and its evidence at t
 
 # Second Opinion release status
 
-Verified locally on 10 October 2026 with Node.js 24. **The full three-phase roadmap remains incomplete.** Real Gemini evaluation, independent human annotation/usability, configured Supabase integration, and a hosted release are not yet established.
+For the 11 October free research service, Chrome extension, ChatGPT/Claude connectors and on-device models, see [the current screening release record](FREE-SCREENING-RELEASE.md). The notes below are historical and concern the original policy-audit roadmap.
+
+Verified locally on 10 October 2026 with Node.js 24. **The full three-phase roadmap remains incomplete.** Real Gemini evaluation, independent human annotation/usability, configured Supabase integration, and a hosted release are not yet established by the checks below.
 
 ## Current verification
 

@@ -12,8 +12,12 @@ dist/
 test-results/
 playwright-report/
 public/pdf.worker.min.mjs
+public/screen-worker.js
+public/models-runtime/
+public/downloads/*.zip
 tmp/
 evaluation-results/
+output/
 *.log
 *.pem
 *.key

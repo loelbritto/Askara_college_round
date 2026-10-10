@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "second-opinion",
+  "version": "1.0.0",
+  "description": "Discover research evidence for a public claim and inspect source coverage, missing evidence, and provenance.",
+  "homepage": "https://secondopinion-ten.vercel.app/screen",
+  "repository": "https://github.com/loelbritto/Askara_college_round",
+  "keywords": ["research", "evidence", "claim-review"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Second Opinion",
+        "shortDescription": "Find research evidence for a public claim",
+        "capabilities": ["Read"],
+        "websiteURL": "https://secondopinion-ten.vercel.app/screen",
+        "defaultPrompt": ["Research this public claim using Second Opinion. Show the sources and what still needs checking."],
+        "brandColor": "#837BFF"
+      }
+    }
+  }
+}

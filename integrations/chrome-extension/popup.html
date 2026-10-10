@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Second Opinion — Check a claim</title>
+    <link rel="stylesheet" href="popup.css">
+    <script src="popup.js" type="module"></script>
+  </head>
+  <body>
+    <header>
+      <span class="mark" aria-hidden="true">S<span>·</span></span>
+      <div><p class="brand">Second Opinion</p><p class="eyebrow">A closer look at every claim.</p></div>
+      <span class="free-tag">No API key</span>
+    </header>
+    <main>
+      <section aria-labelledby="heading">
+        <p class="step">01 / CHOOSE A CLAIM</p>
+        <h1 id="heading">Trust starts with evidence.</h1>
+        <p class="intro">Select one statement in ChatGPT, Claude, or any page. Review it here before checking.</p>
+        <form id="screen-form">
+          <div class="label-row"><label for="claim">Claim to check</label><span id="count">0 / 800</span></div>
+          <textarea id="claim" name="claim" maxlength="800" rows="4" placeholder="Paste a specific, checkable statement…" aria-describedby="claim-hint count" required></textarea>
+          <p id="claim-hint" class="hint">Only the text you choose. Never your whole conversation.</p>
+          <div class="subject-row"><label for="subject">Subject</label><select id="subject" name="subject"><option value="auto">Detect automatically</option><option value="health">Health &amp; medicine</option><option value="science">Science</option><option value="technology">Technology</option><option value="general">General</option></select></div>
+          <p class="privacy">Finding evidence sends this claim to Second Opinion and its research search providers. Avoid private information.</p>
+          <div class="button-row"><button id="submit" type="submit">Find evidence <span aria-hidden="true">↗</span></button><button id="cancel" class="secondary" type="button" hidden>Cancel</button></div>
+        </form>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+      </section>
+      <section id="results" aria-labelledby="results-heading" hidden>
+        <div class="result-heading"><p class="step">02 / READ THE SOURCES</p><span id="source-count"></span></div>
+        <h2 id="results-heading">Evidence to investigate</h2>
+        <p id="notice" class="notice"></p>
+        <div id="sources"></div>
+        <details><summary>Search provider status</summary><ul id="providers"></ul></details>
+      </section>
+      <button id="open-full" type="button" class="full-link">Open full screen for model comparison <span aria-hidden="true">↗</span></button>
+      <p class="local-note">The website can compare open models on your device. A search result alone is not a verified verdict.</p>
+    </main>
+    <footer><span>Evidence first. Certainty earned.</span><button id="clear" type="button">Clear</button></footer>
+  </body>
+</html>

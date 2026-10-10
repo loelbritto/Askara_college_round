@@ -9,7 +9,8 @@ const config: NextConfig = {
       { key: "X-Frame-Options", value: "DENY" },
       { key: "Referrer-Policy", value: "no-referrer" },
       { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-    ]}, { source: "/api/:path*", headers: [{key: "Cache-Control", value: "no-store"}] }];
+    ]}, { source: "/api/:path*", headers: [{key: "Cache-Control", value: "no-store"}] },
+    {source:"/screen-worker.js",headers:[{key:"Content-Security-Policy",value:"default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' https://huggingface.co https://*.hf.co; object-src 'none'"}]}];
   },
 };
 export default config;

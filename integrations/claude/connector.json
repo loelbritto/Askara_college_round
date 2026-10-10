@@ -1,0 +1,8 @@
+{
+  "name": "Second Opinion",
+  "url": "https://secondopinion-ten.vercel.app/api/mcp",
+  "transport": "streamable-http",
+  "authentication": "none",
+  "tools": ["screen_claim"],
+  "note": "Setup reference for Claude's custom connector dialog; this is not a Claude Desktop configuration file or an automatically installed plugin."
+}

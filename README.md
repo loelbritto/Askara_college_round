@@ -1,5 +1,15 @@
 # Second Opinion
 
+## Free research checks and AI integrations
+
+Open **[/screen](https://secondopinion-ten.vercel.app/screen)** to search one public claim through Crossref and, for health/science, Europe PMC. This route does not require a paid inference API or pilot sign-in. Read the retrieved evidence, select up to three passages, then explicitly download and run pinned DeBERTa and RoBERTa models locally. About 240 MB of model assets plus the runtime are needed initially; browser/device resources and service availability still limit use. A reference passage can also be compared locally without searching or transmitting its text.
+
+**[/connect](https://secondopinion-ten.vercel.app/connect)** provides a downloadable Chrome extension and ChatGPT/Claude custom-connector setup. They share the public `/api/screen` and `/api/mcp` evidence service. MCP returns evidence; the two local models run only in the website after an explicit click. No extension or marketplace listing is automatically installed or published.
+
+Published fact-check search is optional and needs `FACT_CHECK_API_KEY`; absent credentials remain visibly unconfigured. An AgentRouter block does not disable the new free research path. The original full-answer policy audit still requires a functioning configured inference provider and its normal authentication.
+
+See [connector setup](docs/AI-CONNECTORS.md), [extension installation](docs/CHROME-EXTENSION.md), [research design](docs/SCREENING-RESEARCH.md), [local models and real verification](docs/LOCAL-MODELS.md), and [defensibility and integrity](docs/DEFENSIBILITY.md).
+
 Second Opinion checks an AI answer against a selected packet of business policies. Reviewers inspect atomic claims, exact evidence passages, and hypothetical changes when a source is excluded. The answer and claim propositions stay fixed during comparison.
 
 The repository contains a working local application, authored examples, DeepSeek and Gemini adapters, validation tests, browser tests, and live-evaluation tooling. **Provider accuracy, available credit and hosted integration are not established by authored samples or mocked tests.** See [release status](docs/RELEASE.md).
@@ -12,6 +22,8 @@ The cinematic homepage combines a clear starting action with layered policy visu
 | --- | --- |
 | `/` | Cinematic product overview, interactive evidence story, guided example, and an entry for your own documents |
 | `/workspace` | Source ingestion, audit, claim search, evidence comparison, reviewer notes, and exports |
+| `/screen` | Free public research discovery, optional local passage input, two models on the user's device, reviewer notes and signed-record export |
+| `/connect` | Download/install the Chrome extension and connect ChatGPT or Claude to the public MCP evidence tool |
 | `/examples` | Searchable library of three authored cases, category filters, and a downloadable synthetic policy pack |
 | `/lab` | Four interactive verdict challenges with explanations; no model request |
 | `/methodology` | Workflow, research foundations, validation boundaries, and document-handling FAQ |

@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Second Opinion — Evidence Screen",
+  "version": "1.0.0",
+  "minimum_chrome_version": "127",
+  "description": "Select an AI claim, review it, and discover research and published fact-checks through Second Opinion.",
+  "permissions": ["activeTab", "scripting", "contextMenus", "storage"],
+  "host_permissions": ["https://secondopinion-ten.vercel.app/*"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": {
+    "default_title": "Check a claim with Second Opinion",
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
+  },
+  "icons": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src https://secondopinion-ten.vercel.app; object-src 'none'; base-uri 'none'"
+  }
+}

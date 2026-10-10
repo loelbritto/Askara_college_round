@@ -7,7 +7,7 @@ import { ArrowUpRight, Menu, X, LogOut, ArrowRight, ShieldCheck } from "lucide-r
 import { Mark } from "./ui";
 import { useWorkspaceMemory } from "./workspace-memory";
 
-const links=[{href:"/",label:"Start here"},{href:"/examples",label:"Examples"},{href:"/methodology",label:"How it works"}];
+const links=[{href:"/",label:"Start here"},{href:"/examples",label:"Examples"},{href:"/screen",label:"Check a claim · Free"},{href:"/connect",label:"Connect your AI"},{href:"/methodology",label:"How it works"}];
 export function SiteHeader({workspace=false,onClear}:{workspace?:boolean;onClear?:()=>void}) {
   const pathname=usePathname(),{state}=useWorkspaceMemory();
   const [menu,setMenu]=useState(false),[scrolled,setScrolled]=useState(false);
