@@ -35,12 +35,19 @@ export async function callDeepSeek(request: AuditRequest, sources: Source[], sig
       if ([400,422].includes(response.status)) throw new AuditError("MODEL_UNAVAILABLE", `${provider} rejected the model or request settings (${response.status}). Check the exact model ID and supported request options.`, 503);
       throw new AuditError("MODEL_UNAVAILABLE", `${provider} is temporarily unavailable. Your inputs are preserved.`, 503);
     }
+    if ((response.headers.get("content-type") || "").toLowerCase().includes("text/html")) {
+      await response.body?.cancel();
+      throw new AuditError("MODEL_UNAVAILABLE", `${provider} returned a web page instead of API JSON. Its gateway may be challenging or blocking server requests. Ask the provider to enable API access from this deployment. No retry was made.`, 503);
+    }
     // Bound the provider response, including malformed or unexpectedly large output.
     const reader=response.body?.getReader();
     if (!reader) throw new AuditError("INVALID_OUTPUT", `${provider} returned an empty response.`, 502);
     const chunks:Uint8Array[]=[];let size=0;
     try {while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>1048576){await reader.cancel();throw new AuditError("INVALID_OUTPUT",`${provider} returned an oversized response. No results were accepted.`,502);}chunks.push(value);}} finally {reader.releaseLock();}
-    const parsed=envelopeSchema.safeParse(JSON.parse(Buffer.concat(chunks).toString("utf8")));
+    let envelope:unknown;
+    try { envelope=JSON.parse(Buffer.concat(chunks).toString("utf8")); }
+    catch { throw new AuditError("INVALID_OUTPUT", `${provider}'s API returned a non-JSON response. No model result was accepted. Check provider gateway compatibility.`, 502); }
+    const parsed=envelopeSchema.safeParse(envelope);
     if (!parsed.success) throw new AuditError("INVALID_OUTPUT", `${provider} returned an unreadable response. No unverified results were accepted.`, 502);
     const choice=parsed.data.choices[0];
     if (choice.finish_reason!=="stop" || !choice.message.content?.trim()) throw new AuditError("BLOCKED_RESPONSE", `${provider} did not finish the audit. Your inputs are preserved; no partial results were accepted.`, 502);
@@ -51,7 +58,7 @@ export async function callDeepSeek(request: AuditRequest, sources: Source[], sig
   } catch(error) {
     if (error instanceof AuditError) throw error;
     if (abort.aborted) throw new AuditError("TIMEOUT", "The audit timed out or was cancelled. Your inputs are preserved.", 504);
-    if (error instanceof SyntaxError) throw new AuditError("INVALID_OUTPUT", `${provider} returned invalid JSON. No results were accepted; retry only when ready.`, 502);
+    if (error instanceof SyntaxError) throw new AuditError("INVALID_OUTPUT", `${provider}'s model returned invalid audit JSON. No results were accepted; retry only when ready.`, 502);
     throw new AuditError("MODEL_UNAVAILABLE", `${provider} could not be reached. Your inputs are preserved; no automatic retry was made.`, 503);
   }
 }

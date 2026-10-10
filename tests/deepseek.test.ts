@@ -10,6 +10,16 @@ beforeEach(()=>{vi.stubGlobal("fetch",fetchMock);fetchMock.mockReset();vi.stubEn
 afterEach(()=>{vi.unstubAllEnvs();vi.unstubAllGlobals();});
 async function input(){const sources=await sampleSources();return {sources,request:{mode:"audit" as const,answer:SAMPLE_ANSWER,context:SAMPLE_CONTEXT,sources,selectedSourceIds:sources.map(s=>s.id)}};}
 describe("DeepSeek provider boundary",()=>{
+  it("distinguishes a gateway web page from invalid model output without exposing either body",async()=>{
+    vi.stubEnv("AI_PROVIDER","agentrouter");const {sources,request}=await input();
+    fetchMock.mockResolvedValueOnce(new Response("<html>private gateway challenge</html>",{headers:{"content-type":"text/html"}}));
+    await expect(callModel(request,sources)).rejects.toMatchObject({code:"MODEL_UNAVAILABLE",message:expect.stringContaining("web page instead of API JSON")});
+    fetchMock.mockResolvedValueOnce(new Response("private non-json envelope"));
+    await expect(callModel(request,sources)).rejects.toMatchObject({message:expect.stringContaining("API returned a non-JSON response")});
+    fetchMock.mockResolvedValueOnce(Response.json({choices:[{finish_reason:"stop",message:{content:"not audit JSON"}}]}));
+    await expect(callModel(request,sources)).rejects.toMatchObject({message:expect.stringContaining("model returned invalid audit JSON")});
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
   it("routes only explicitly selected AgentRouter calls using the permitted model and existing key slot",async()=>{
     vi.stubEnv("AI_PROVIDER","agentrouter");vi.stubEnv("AGENTROUTER_API_KEY","");vi.stubEnv("AGENTROUTER_MODEL","");
     const {sources,request}=await input();
