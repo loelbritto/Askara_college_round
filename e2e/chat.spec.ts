@@ -17,10 +17,24 @@ test("live demo opens an authenticated DeepSeek review with one explicit request
   await page.getByLabel("Pilot access code").fill("test-demo-access");
   await page.getByRole("button",{name:"Open session & check"}).click();
   await expect(page.locator(".mode-banner")).toContainText("Live audit");
+  await expect(page.locator(".chat-side-bottom")).toContainText("Session active");
   await expect(page.locator(".finding-row")).toHaveCount(6);expect(calls).toBe(1);
   await page.getByRole("button",{name:"Review first issue"}).click();
   await expect(page.locator(".selected-claim")).toContainText("Opened items");
   const download=page.waitForEvent("download");await page.getByRole("button",{name:"Export JSON"}).click();expect((await download).suggestedFilename()).toContain("live");
+});
+
+test("AgentRouter is disclosed and permission failures preserve the user's draft",async({page})=>{
+  await page.route("**/api/health",r=>r.fulfill({json:{configured:true,enabled:true,authenticated:true,provider:"agentrouter",model:"deepseek-v4-flash"}}));
+  let calls=0;
+  await page.route("**/api/audit",r=>{calls++;return r.fulfill({status:503,json:{error:{code:"MODEL_UNAVAILABLE",message:"AgentRouter denied access (403). Check the token's model permissions and provider access restrictions."}}});});
+  await page.goto("/workspace");await page.getByRole("button",{name:"Set up a live demo"}).click();
+  await expect(page.locator(".chat-side-bottom")).toContainText("DeepSeek via AgentRouter");
+  await expect(page.locator(".composer-disclosure")).toContainText("AgentRouter");
+  await page.getByRole("button",{name:"Check answer",exact:true}).click();
+  await expect(page.locator(".notice.error")).toContainText("AgentRouter denied access (403)");
+  await expect(page.getByLabel("AI answer to check")).toContainText("Refunds arrive within 48 hours.");
+  await expect(page.locator(".composer-file")).toHaveCount(3);expect(calls).toBe(1);
 });
 
 test("composer keeps drafts and explains missing deployment settings",async({page})=>{

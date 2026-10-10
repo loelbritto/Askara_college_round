@@ -1,5 +1,15 @@
 # DeepSeek live demo on Vercel
 
+## AgentRouter-issued keys
+
+Keys from `agentrouter.org` must use that service, not DeepSeek's official endpoint. Set `AI_PROVIDER=agentrouter` and `AGENTROUTER_MODEL=deepseek-v4-flash` (verify this exact ID is allowed by your token). Prefer `AGENTROUTER_API_KEY` for new installations. For migration, the adapter can use the already stored `DEEPSEEK_API_KEY` when `AGENTROUTER_API_KEY` is empty; this happens only after explicitly selecting AgentRouter. It never retries against another provider.
+
+The endpoint is fixed to `https://agentrouter.org/v1/chat/completions`; arbitrary URLs and redirects are not allowed. Documents go to AgentRouter and its upstream model provider. The UI discloses this route. The token's permissions and usage limits are not modified by the app. AgentRouter's own client restrictions and availability still apply; the app does not impersonate another client.
+
+Source: [AgentRouter's official integration documentation](https://github.com/agentrouter-org/docs/blob/main/qwencode.md). The `deepseek-v4-flash` model restriction was confirmed in the owner's console on 2026-10-11.
+
+Errors distinguish key rejection (401), permissions (403), missing model/endpoint (404), and request incompatibility (400/422) without exposing the provider response body. Configuration health only verifies environment settings; a successful live audit is required to establish connectivity.
+
 The workspace now supports DeepSeek's official API as an explicit alternative to Gemini. This is prepaid usage, authorized for this project by its owner; it is not labelled free. No new provider SDK is required.
 
 ## Configure your existing Vercel project
