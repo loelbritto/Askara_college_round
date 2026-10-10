@@ -8,7 +8,15 @@ The endpoint is fixed to `https://agentrouter.org/v1/chat/completions`; arbitrar
 
 Source: [AgentRouter's official integration documentation](https://github.com/agentrouter-org/docs/blob/main/qwencode.md). The `deepseek-v4-flash` model restriction was confirmed in the owner's console on 2026-10-11.
 
-Errors distinguish key rejection (401), permissions (403), missing model/endpoint (404), and request incompatibility (400/422) without exposing the provider response body. Configuration health only verifies environment settings; a successful live audit is required to establish connectivity.
+Errors distinguish authentication or client rejection (401), permissions (403), missing model/endpoint (404), and request incompatibility (400/422) without exposing the provider response body. Configuration health only verifies environment settings; a successful live audit is required to establish connectivity.
+
+### Deployment verification — 2026-10-11
+
+The `secondopinion` Vercel project was reconnected to `loelbritto/Askara_college_round`. Production origin, pilot access, and session-signing settings were saved with the owner's approval. The public health endpoint reports configured/enabled with provider `agentrouter`, model `deepseek-v4-flash`, and no missing settings. Pilot sign-in works; the production example walkthrough renders six authored findings and evidence controls.
+
+**Live provider access is blocked.** A deployed audit received an HTML web page rather than an API JSON response. A separate minimal request from the development machine using the owner's existing token received HTTP 401 with `unauthorized client detected, contact support for assistance`. No live report was accepted. AgentRouter's console restricts this token to `deepseek-v4-flash`; its $3 token quota and permissions were left unchanged. The adapter does not impersonate a supported coding client or bypass the gateway.
+
+Next step: ask AgentRouter to permit this application's server requests, or configure an official DeepSeek API key with `AI_PROVIDER=deepseek`. Do not put either key in GitHub or chat. After provider access is resolved, rerun the live demo and verify the six-claim baseline, source comparison, and revised-answer audit. Authored samples and mocked tests are not evidence of a successful live model call. Supabase accounts and cloud saves remain unconfigured on this deployment.
 
 The workspace now supports DeepSeek's official API as an explicit alternative to Gemini. This is prepaid usage, authorized for this project by its owner; it is not labelled free. No new provider SDK is required.
 

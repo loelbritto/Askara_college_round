@@ -39,7 +39,7 @@ describe("DeepSeek provider boundary",()=>{
   it("prefers the dedicated AgentRouter key and never falls back after credential rejection",async()=>{
     vi.stubEnv("AI_PROVIDER","agentrouter");vi.stubEnv("AGENTROUTER_API_KEY","dedicated-private-key");
     const {sources,request}=await input();fetchMock.mockResolvedValue(new Response("secret error body",{status:401}));
-    await expect(callModel(request,sources)).rejects.toMatchObject({message:expect.stringContaining("AgentRouter rejected the API key (401)")});
+    await expect(callModel(request,sources)).rejects.toMatchObject({message:expect.stringContaining("AgentRouter rejected authentication or client access (401)")});
     expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe("Bearer dedicated-private-key");expect(fetchMock).toHaveBeenCalledTimes(1);
   });
   it("blocks AgentRouter before network access when no key exists",async()=>{

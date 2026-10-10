@@ -29,7 +29,7 @@ export async function callDeepSeek(request: AuditRequest, sources: Source[], sig
       await response.body?.cancel();
       if (response.status === 402) throw new AuditError("QUOTA", `${provider} credit is exhausted. The operator needs to check the account balance. No retry was made.`, 429);
       if (response.status === 429) throw new AuditError("QUOTA", `${provider} is rate-limiting requests. Wait before trying again. No automatic retry was made.`, 429);
-      if (response.status === 401) throw new AuditError("MODEL_UNAVAILABLE", `${provider} rejected the API key (401). Check that the key was issued by ${provider}, is active, and was saved without extra text.`, 503);
+      if (response.status === 401) throw new AuditError("MODEL_UNAVAILABLE", `${provider} rejected authentication or client access (401). Verify the key and ask the provider whether this web application is permitted.`, 503);
       if (response.status === 403) throw new AuditError("MODEL_UNAVAILABLE", `${provider} denied access (403). Check the token's model permissions and provider access restrictions.`, 503);
       if (response.status === 404) throw new AuditError("MODEL_UNAVAILABLE", `${provider} could not find the configured model or endpoint (404). Check the exact model ID.`, 503);
       if ([400,422].includes(response.status)) throw new AuditError("MODEL_UNAVAILABLE", `${provider} rejected the model or request settings (${response.status}). Check the exact model ID and supported request options.`, 503);
