@@ -18,7 +18,7 @@ export function ClaimScreen(){
   const receiptGeneration=useRef(0);
   const worker=useRef<Worker|null>(null),controller=useRef<AbortController|null>(null),results=useRef<HTMLElement|null>(null);
   const sources=[...(localSource?[localSource]:[]),...(report?.sources??[])];
-  useEffect(()=>{const imported=new URLSearchParams(location.hash.slice(1)).get("claim");if(imported){setClaim(imported.slice(0,800));history.replaceState(null,"",location.pathname);}return()=>{worker.current?.terminate();controller.current?.abort();};},[]);
+  useEffect(()=>{const params=new URLSearchParams(location.hash.slice(1));const imported=params.get("claim");if(imported){setClaim(imported.slice(0,800));const importedSubject=params.get("subject");if(importedSubject&&["auto","health","science","technology","general"].includes(importedSubject))setSubject(importedSubject as ScreenRequest["subject"]);history.replaceState(null,"",location.pathname);}return()=>{worker.current?.terminate();controller.current?.abort();};},[]);
   function resetModels(){worker.current?.terminate();worker.current=null;setRunning(false);setVotes([]);setExcerpts([]);setFailures([]);setProgress("");}
   function editClaim(value:string){receiptGeneration.current++;controller.current?.abort();controller.current=null;setBusy(false);resetModels();setClaim(value);setReport(null);setLocalSource(null);setSelected([]);setNotes("");setError("");setReceiptStatus("");}
   function addLocalPassage(){

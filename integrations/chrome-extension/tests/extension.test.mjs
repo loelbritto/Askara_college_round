@@ -42,11 +42,13 @@ test("does not allow executable or credential-bearing citation links", () => {
 });
 
 test("claim handoff uses a URL fragment, never a request query", () => {
-  const url = new URL(fullScreenUrl(`${claim} & # 100%`));
+  const url = new URL(fullScreenUrl(`${claim} & # 100%`, "health"));
   assert.equal(url.origin, APP_ORIGIN);
   assert.equal(url.pathname, "/screen");
   assert.equal(url.search, "");
   assert.equal(new URLSearchParams(url.hash.slice(1)).get("claim"), `${claim} & # 100%`);
+  assert.equal(new URLSearchParams(url.hash.slice(1)).get("subject"), "health");
+  assert.equal(new URLSearchParams(new URL(fullScreenUrl(claim, "invalid")).hash.slice(1)).get("subject"), "auto");
 });
 
 test("shows meaningful errors on rate limiting, HTML gateways and invalid JSON", async () => {

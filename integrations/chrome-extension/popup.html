@@ -17,11 +17,12 @@
       <section aria-labelledby="heading">
         <p class="step">01 / CHOOSE A CLAIM</p>
         <h1 id="heading">Trust starts with evidence.</h1>
-        <p class="intro">Select one statement in ChatGPT, Claude, or any page. Review it here before checking.</p>
+        <p class="intro">Select one statement in ChatGPT, Claude, or a webpage, or paste it below. Review it here before checking.</p>
+        <div class="utility-row"><button id="capture" type="button" class="secondary">Use selected text</button><button id="open-tab" type="button" class="secondary">Open in a tab ↗</button></div>
         <form id="screen-form">
           <div class="label-row"><label for="claim">Claim to check</label><span id="count">0 / 800</span></div>
           <textarea id="claim" name="claim" maxlength="800" rows="4" placeholder="Paste a specific, checkable statement…" aria-describedby="claim-hint count" required></textarea>
-          <p id="claim-hint" class="hint">Only the text you choose. Never your whole conversation.</p>
+          <p id="claim-hint" class="hint">Drafts and results stay in this browser session when the popup closes. Clear removes them.</p>
           <div class="subject-row"><label for="subject">Subject</label><select id="subject" name="subject"><option value="auto">Detect automatically</option><option value="health">Health &amp; medicine</option><option value="science">Science</option><option value="technology">Technology</option><option value="general">General</option></select></div>
           <p class="privacy">Finding evidence sends this claim to Second Opinion and its research search providers. Avoid private information.</p>
           <div class="button-row"><button id="submit" type="submit">Find evidence <span aria-hidden="true">↗</span></button><button id="cancel" class="secondary" type="button" hidden>Cancel</button></div>
@@ -36,7 +37,7 @@
         <details><summary>Search provider status</summary><ul id="providers"></ul></details>
       </section>
       <button id="open-full" type="button" class="full-link">Open full screen for model comparison <span aria-hidden="true">↗</span></button>
-      <p class="local-note">The website can compare open models on your device. A search result alone is not a verified verdict.</p>
+      <p class="local-note">Your claim and subject open on the website. There, choose Find evidence, then run the models on your device. A search result alone is not a verified verdict.</p>
     </main>
     <footer><span>Evidence first. Certainty earned.</span><button id="clear" type="button">Clear</button></footer>
   </body>

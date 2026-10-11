@@ -18,7 +18,7 @@ const context = await chromium.launchPersistentContext(profile, {
 try {
   const worker = context.serviceWorkers()[0] || await context.waitForEvent("serviceworker", { timeout: 10000 });
   const extensionId = new URL(worker.url()).host;
-  const page = await context.newPage();
+  let page = await context.newPage();
   const claim = "Antibiotics are effective against viral infections.";
   await worker.evaluate(async (text) => {
     await chrome.storage.session.set({ pendingClaim: { text, at: Date.now(), truncated: false } });
@@ -52,12 +52,24 @@ try {
   assert.equal(await page.locator(".source a").count(), 1);
   assert.equal(await page.locator(".source").nth(1).textContent(), "Research source · Untrusted test<img src=x onerror=alert(1)>");
   assert.equal(await worker.evaluate(async () => (await chrome.storage.session.get("pendingClaim")).pendingClaim), undefined);
+  await page.close();
+  page = await context.newPage();
+  await page.goto(`chrome-extension://${extensionId}/popup.html?view=tab`);
+  await page.getByText("2 sources", { exact: true }).waitFor();
+  assert.equal(await page.locator("#claim").inputValue(), claim);
+  assert.equal(requests, 1, "Reopening a completed review must not repeat its network request");
   await page.setViewportSize({ width: 460, height: 930 });
   await page.screenshot({ path: resolve(output, "extension-evidence.png"), fullPage: true });
   await page.getByRole("button", { name: "Clear", exact: true }).click();
   assert.equal(await page.locator("#claim").inputValue(), "");
   assert.equal(await page.locator(".source").count(), 0);
-  console.log("Isolated extension smoke passed: MV3 loaded; review-before-send; API contract; safe rendering; session cleanup; clear.");
+  await page.locator("#claim").fill("A fresh draft must survive closing the popup immediately.");
+  await page.close();
+  page = await context.newPage();
+  await page.goto(`chrome-extension://${extensionId}/popup.html?view=tab`);
+  await page.waitForFunction(() => document.querySelector("#claim")?.value === "A fresh draft must survive closing the popup immediately.");
+  assert.equal(requests, 1);
+  console.log("Isolated extension smoke passed: MV3 loaded; explicit search; safe rendering; results and drafts survive closing; no duplicate request; clear.");
 } finally {
   await context.close();
 }

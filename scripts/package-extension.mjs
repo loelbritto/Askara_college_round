@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 // Deliberately fixed contents: no environment files, tokens, build caches or tests.
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const extension = resolve(root, "integrations/chrome-extension");
-const files = ["manifest.json", "background.js", "shared.js", "popup.html", "popup.css", "popup.js", "PRIVACY.md", "icons/icon16.png", "icons/icon32.png", "icons/icon48.png", "icons/icon128.png"];
+const files = ["00-START-HERE.html", "manifest.json", "background.js", "shared.js", "popup.html", "popup.css", "popup.js", "PRIVACY.md", "icons/icon16.png", "icons/icon32.png", "icons/icon48.png", "icons/icon128.png"];
 const argument = process.argv.indexOf("--out");
 if (argument !== -1 && !process.argv[argument + 1]) throw new Error("--out requires a ZIP file path.");
 const destination = resolve(root, argument === -1 ? "output/chrome-extension/second-opinion-chrome.zip" : process.argv[argument + 1]);

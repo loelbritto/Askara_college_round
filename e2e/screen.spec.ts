@@ -6,9 +6,10 @@ const result={id:"test-record",claim:"The library is closed on Sundays.",subject
 
 test("extension handoff requires consent; fact-check claim text cannot enter NLI; edits invalidate results",async({page})=>{
   let calls=0;
-  await page.route("**/api/screen",route=>{calls++;expect(route.request().postDataJSON()).toEqual({claim:result.claim,subject:"auto",discover:true});return route.fulfill({json:result});});
-  await page.goto(`/screen#claim=${encodeURIComponent(result.claim)}`);
+  await page.route("**/api/screen",route=>{calls++;expect(route.request().postDataJSON()).toEqual({claim:result.claim,subject:"general",discover:true});return route.fulfill({json:result});});
+  await page.goto(`/screen#claim=${encodeURIComponent(result.claim)}&subject=general`);
   await expect(page.getByLabel("What claim would you like to check?")).toHaveValue(result.claim);
+  await expect(page.getByLabel("Subject",{exact:false})).toHaveValue("general");
   expect(page.url()).not.toContain("#");expect(calls).toBe(0);
   await expect(page.getByRole("button",{name:"Find evidence",exact:true})).toBeDisabled();
   await page.getByLabel("Search public sources with this claim.",{exact:false}).check();
@@ -62,5 +63,17 @@ test("free screening and integration setup are accessible on desktop and mobile"
   await page.screenshot({path:"output/screening/mobile.png",fullPage:true});
   await page.goto("/connect");expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   expect((await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);
-  await expect(page.getByRole("link",{name:"Download extension"})).toHaveAttribute("href","/downloads/second-opinion-chrome.zip");
+  await expect(page.getByRole("heading",{name:"3. Click “Load unpacked”"})).toBeVisible();
+  await page.getByText("Already installed, or stuck on a step?",{exact:true}).click();
+  await expect(page.getByText("“Manifest missing”:",{exact:false})).toBeVisible();
+  await page.screenshot({path:"output/screening/connect-mobile.png",fullPage:true});
+  await page.setViewportSize({width:1440,height:1000});
+  await page.screenshot({path:"output/screening/connect-desktop.png",fullPage:true});
+  await page.locator(".connect-explainer").scrollIntoViewIfNeeded();
+  expect((await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);
+  const zipDownload=page.waitForEvent("download");
+  await page.getByRole("link",{name:"Download extension ZIP"}).click();
+  expect((await zipDownload).suggestedFilename()).toBe("second-opinion-chrome.zip");
+  await expect(page.getByRole("status").filter({hasText:"Download requested"})).toBeVisible();
+  await expect(page.getByRole("link",{name:"Download extension ZIP"})).toHaveAttribute("href",/^\/downloads\/second-opinion-chrome\.zip\?v=/);
 });

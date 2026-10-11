@@ -23,9 +23,9 @@ export function safeSourceUrl(value) {
   }
 }
 
-export function fullScreenUrl(claim) {
+export function fullScreenUrl(claim, subject = "auto") {
   const url = new URL("/screen", APP_ORIGIN);
-  url.hash = new URLSearchParams({ claim: validateClaim(claim) }).toString();
+  url.hash = new URLSearchParams({ claim: validateClaim(claim), subject: SUBJECTS.includes(subject) ? subject : "auto" }).toString();
   return url.href;
 }
 
