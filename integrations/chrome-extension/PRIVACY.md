@@ -2,7 +2,7 @@
 
 The extension reads only the text you select after you open it or use its context menu. It does not read your full conversation, watch page changes, access cookies, collect browsing history, or store an API key.
 
-A context-menu selection is kept in Chrome's session storage for the handoff into the review popup. It is removed when the popup reads it. Your current draft, subject, search status and results stay in Chrome's session storage so closing the popup does not lose your work. The extension's background worker continues a started search while the popup is closed. This is one current review, not a conversation history. The Clear button removes the current draft, results and pending handoff. Chrome clears session storage on browser restart, extension reload, disable or update.
+Text selected through the context menu becomes your current draft. Your draft, subject, search status and results stay in Chrome's session storage so closing the popup does not lose your work. The extension's background worker continues a started search while the popup is closed. This is one current review, not a conversation history. The Clear button removes the current draft, results and pending handoff. Chrome clears session storage on browser restart, extension reload, disable or update.
 
 **Find evidence** explicitly sends your edited claim and chosen subject to `https://secondopinion-ten.vercel.app/api/screen`. Second Opinion sends the search terms to its evidence providers. Do not enter private information. No account cookies are sent. Evidence providers may have their own access logging and privacy policies. The deployed service's provider status identifies which services were queried and whether they succeeded.
 
